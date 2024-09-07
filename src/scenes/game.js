@@ -1,4 +1,4 @@
-let width, height, targets = [], slide, popButtons = [], mContext;
+let width, height, targets = [], slide, popButtons = [], mContext, fullScreen;
 let slides = [
     '3', '8', '9', '10', '11', '12', '13', '14', '15', '16',
     '17', '18', '20', '21', '22', '23', '24', '26', '27', '36',
@@ -14,11 +14,14 @@ export class Game extends Phaser.Scene {
 
     preload(){
         this.load.setPath('public/assets');
-        this.load.image('mapa', 'mapa.png');
+        this.load.image('mapa', 'mapa.jpg');
         this.load.image('square', 'square.png');
         this.load.image('next', 'siguiente.png');
         this.load.image('prev', 'atras.png');
         this.load.image('home', 'home.png');
+        this.load.image('fullScreen-on', 'fullscreen-on.png');
+        this.load.image('fullScreen-off', 'fullscreen-off.png');
+        this.load.spritesheet('indicador', 'indicador.png', { frameWidth: 94, frameHeight: 94 });
 
         slides.forEach(cont => {
             this.load.image(cont, `slides/${cont}.png`);
@@ -31,13 +34,25 @@ export class Game extends Phaser.Scene {
         height = this.game.config.height;
 
         this.cameras.main.setBounds(0, 0, 1920, 1080);
-        this.add.image(0, 0, 'mapa').setScale(0.47, .57).setOrigin(0);
+        this.add.image(0, 0, 'mapa').setOrigin(0);
 
         const cam = this.cameras.main;
         cam.setZoom(1);
         cam.centerOn(0, 0);
+        this.init_();
 
-        this.init();
+        /* FULLSCREEN */
+        fullScreen.setInteractive().on('pointerdown', function() {
+            if (mContext.scale.isFullscreen) {
+                mContext.scale.stopFullscreen();
+                fullScreen.setTexture('fullScreen-on');
+                // On full screen off
+            } else {
+                mContext.scale.startFullscreen();
+                fullScreen.setTexture('fullScreen-off');
+                // On start fulll screen
+            }
+        });
 
         targets.forEach(target => {
             target.setAlpha(0.001);
@@ -67,15 +82,16 @@ export class Game extends Phaser.Scene {
     popUp(target, cam){
         let contSlide = 0;
         mContext.deletePopUp();
-        slide = mContext.physics.add.sprite((cam.width/2), (cam.height/2), target.slides[contSlide]).setScale(0.6).setScrollFactor(0);
+        slide = mContext.physics.add.sprite((cam.width/2), (cam.height/2), target.slides[contSlide]).setScale(0.45, 0.6).setScrollFactor(0);
 
-        let nextBtn = mContext.physics.add.sprite((cam.width/2) + 500, (cam.height) - 270, 'next').setScale(0.3).setInteractive().setScrollFactor(0).setAlpha(.6).setDepth(1);;
-        let prevBtn = mContext.physics.add.sprite((cam.width/2) + 370, (cam.height) - 270, 'prev').setScale(0.3).setInteractive().setScrollFactor(0).setAlpha(0).setDepth(1);;
-        let homeBtn = mContext.physics.add.sprite((cam.width/2) + 265, (cam.height) - 270, 'home').setScale(0.3).setInteractive().setScrollFactor(0).setAlpha(.6).setDepth(1);
+        let nextBtn = mContext.physics.add.sprite((cam.width/2) + 350, (cam.height) - 270, 'next').setScale(0.3).setInteractive().setScrollFactor(0).setAlpha(.6).setDepth(1);;
+        let prevBtn = mContext.physics.add.sprite((cam.width/2) + 220, (cam.height) - 270, 'prev').setScale(0.3).setInteractive().setScrollFactor(0).setAlpha(0).setDepth(1);;
+        let homeBtn = mContext.physics.add.sprite((cam.width/2) + 115, (cam.height) - 270, 'home').setScale(0.3).setInteractive().setScrollFactor(0).setAlpha(.6).setDepth(1);
+        if (target.slides.length === 1){ nextBtn.setAlpha(0);homeBtn.setX((cam.width/2) + 350); }
         popButtons.push(nextBtn, prevBtn, homeBtn);
-
         
         nextBtn.on('pointerdown', () => {
+            nextBtn.setScale(.25);
             if (contSlide < target.slides.length-1){
                 contSlide++;
                 slide.setTexture(target.slides[contSlide]);
@@ -90,7 +106,12 @@ export class Game extends Phaser.Scene {
             }
         });
 
+        nextBtn.on('pointerout', () => {            
+            nextBtn.setScale(.3); 
+        });
+
         prevBtn.on('pointerdown', () => {
+            prevBtn.setScale(.25);
             if (contSlide > 0){
                 contSlide--;
                 slide.setTexture(target.slides[contSlide]);
@@ -103,11 +124,20 @@ export class Game extends Phaser.Scene {
             }
         });
 
+        prevBtn.on('pointerout', () => {            
+            prevBtn.setScale(.3); 
+        });
+
         homeBtn.on('pointerdown', function(){
+            homeBtn.setScale(.25); 
             cam.pan(0, 0, 2000, 'Power2');
             cam.zoomTo(1, 2000);
             mContext.deletePopUp();
             target.setInteractive();
+        });
+
+        homeBtn.on('pointerout', () => {            
+            homeBtn.setScale(.3); 
         });
     }
 
@@ -116,60 +146,98 @@ export class Game extends Phaser.Scene {
         if (popButtons){ popButtons.forEach(btn => { btn.destroy() })}
     }
 
-    init(){
+    init_(){
+        /* ANIMACIONES */
+        this.anims.create({
+            key: 'iddle',
+            frames: this.anims.generateFrameNumbers('indicador', { start: 0, end: 7 }),
+            frameRate: 5,
+            repeat: -1
+        });
+
+        fullScreen = this.add.image(50, 50, 'fullScreen-on').setScale(.6); 
+
+        let indicador = this.add.sprite(1180, 104, 'indicador'); 
+        indicador.anims.play('iddle');
         let target = this.add.sprite(1170, 214, 'square').setScale(1.8).setInteractive().setAngle(45);
         target.slides = [36];
         targets.push(target);
 
+        indicador = this.add.sprite(1094, 11, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(1084, 121, 'square').setScale(1.8).setInteractive().setAngle(45);
         target.slides = [20, 21, 22];
         targets.push(target);
 
+        indicador = this.add.sprite(1179, 448, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(1160, 558, 'square').setScale(3.5, 3).setInteractive().setAngle(45);
         target.slides = [13, 20, 21, 22];
         targets.push(target);
 
+        indicador = this.add.sprite(1018, 582, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(1008, 692, 'square').setScale(2).setInteractive().setAngle(45);
         target.slides = [12, 52, 53, 55, 56];
         targets.push(target);
 
+        indicador = this.add.sprite(850, 715, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(840, 825, 'square').setScale(2.5, 2).setInteractive().setAngle(45);
         target.slides = [47];
         targets.push(target);
 
+        indicador = this.add.sprite(711, 846, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(701, 956, 'square').setScale(2).setInteractive().setAngle(45);
         target.slides = [39];
         targets.push(target);
 
+        indicador = this.add.sprite(110, 867, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(101, 977, 'square').setScale(2).setInteractive().setAngle(45);
         target.slides = [36];
         targets.push(target);
 
+        indicador = this.add.sprite(502, 675, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(492, 785, 'square').setScale(3, 2.5).setInteractive().setAngle(45);
         target.slides = [8, 9, 10, 11, 39, 46, 47, 52, 53, 54];
         targets.push(target);
         
+        indicador = this.add.sprite(405, 535, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(395, 645, 'square').setScale(2).setInteractive().setAngle(45)
         target.slides = [36, 46, 52, 53];
         targets.push(target);
         
+        indicador = this.add.sprite(826, 111, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(816, 221, 'square').setScale(2).setInteractive().setAngle(45);
         target.slides = [58];
         targets.push(target);
 
+        indicador = this.add.sprite(953, 228, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(943, 338, 'square').setScale(2).setInteractive().setAngle(45);
         target.slides = [58];
         targets.push(target);
 
+        indicador = this.add.sprite(565, 72, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(555, 182, 'square').setScale(2).setInteractive().setAngle(45);
         target.slides = [36, 15, 16, 17, 18];
         targets.push(target);
         
+        indicador = this.add.sprite(323, 59, 'indicador'); 
+        indicador.anims.play('iddle');
         target = this.add.sprite(313, 59, 'square').setScale(4).setInteractive().setAngle(45);
         target.slides = [36, 15, 16, 17, 18];
         targets.push(target);
         
-        target = this.add.sprite(406, 307, 'square').setScale(2, 4).setInteractive().setAngle(45);
+        indicador = this.add.sprite(416, 187, 'indicador'); 
+        indicador.anims.play('iddle');
+        target = this.add.sprite(406, 197, 'square').setScale(2, 4).setInteractive().setAngle(45);
         target.slides = [15, 16, 17, 18];
         targets.push(target);
     }
