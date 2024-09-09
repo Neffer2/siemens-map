@@ -14,7 +14,7 @@ export class Game extends Phaser.Scene {
 
     preload(){
         this.load.setPath('public/assets');
-        this.load.image('mapa', 'mapa.jpg');
+        this.load.image('mapa', 'mapa.png');
         this.load.image('square', 'square.png');
         this.load.image('next', 'siguiente.png');
         this.load.image('prev', 'atras.png');
@@ -60,10 +60,10 @@ export class Game extends Phaser.Scene {
             target.setAlpha(0.001);
         });
 
-        // let mouse = this.input;
-        // mouse.on('pointerdown', function(pointer){
-        //     console.log(pointer.x, pointer.y);
-        // });
+        let mouse = this.input;
+        mouse.on('pointerdown', function(pointer){
+            console.log(pointer.x, pointer.y);
+        });
 
         targets.forEach(target => {
             target.on('pointerdown', function(){
@@ -264,15 +264,15 @@ export class Game extends Phaser.Scene {
         target.slides = [15, 15, 17, 18];
         targets.push(target);
 
-        indicador = this.add.sprite(1505, 56, 'indicador'); 
+        indicador = this.add.sprite(1589, 30, 'indicador'); 
         indicador.anims.play('iddle');
-        target = this.add.sprite(1495, 96, 'square').setScale(2, 4).setInteractive().setAngle(45);
+        target = this.add.sprite(1589, 96, 'square').setScale(2, 4).setInteractive().setAngle(45);
         target.slides = [59, 60, 61, 62, 63, 64, 65];
         targets.push(target);
 
-        indicador = this.add.sprite(1577, 133, 'indicador'); 
+        indicador = this.add.sprite(1623, 170, 'indicador'); 
         indicador.anims.play('iddle');
-        target = this.add.sprite(1567, 233, 'square').setScale(2, 4).setInteractive().setAngle(45);
+        target = this.add.sprite(1623, 240, 'square').setScale(2, 4).setInteractive().setAngle(45);
         target.slides = [23, 24, 26, 27, 28];
         targets.push(target);
     }
