@@ -1,4 +1,4 @@
-let width, height, targets = [], slide, popButtons = [], mContext, fullScreen;
+let width, height, targets = [], slide, popButtons = [], mContext, fullScreen, video_28;
 let slides = [
     '3', '8', '9', '10', '11', '12', '13', '14', '15', '16',
     '17', '18', '20', '21', '22', '23', '24', '26', '27', '36',
@@ -21,11 +21,13 @@ export class Game extends Phaser.Scene {
         this.load.image('home', 'home.png');
         this.load.image('fullScreen-on', 'fullscreen-on.png');
         this.load.image('fullScreen-off', 'fullscreen-off.png');
-        this.load.spritesheet('indicador', 'indicador.png', { frameWidth: 94, frameHeight: 94 });
+        this.load.spritesheet('indicador', 'indicador.png', { frameWidth: 100, frameHeight: 120 });
 
         slides.forEach(cont => {
             this.load.image(cont, `slides/${cont}.png`);
         });
+
+        this.load.video('28', [ 'slides/28.mp4']);
     }
 
     create(){
@@ -94,7 +96,14 @@ export class Game extends Phaser.Scene {
             nextBtn.setScale(.25);
             if (contSlide < target.slides.length-1){
                 contSlide++;
-                slide.setTexture(target.slides[contSlide]);
+                
+                if (target.slides[contSlide] === 28){
+                    slide.setAlpha(.001);
+                    video_28 = mContext.add.video((cam.width/2), (cam.height/2), target.slides[contSlide]).setScale(1.3).setScrollFactor(0);
+                    video_28.play();
+                }else {
+                    slide.setTexture(target.slides[contSlide]);
+                }
             }
 
             if (contSlide === target.slides.length-1){
@@ -113,7 +122,14 @@ export class Game extends Phaser.Scene {
         prevBtn.on('pointerdown', () => {
             prevBtn.setScale(.25);
             if (contSlide > 0){
-                contSlide--;
+                contSlide --;
+
+                if (target.slides[contSlide + 1] === 28){
+                    slide.setAlpha(1);
+                    video_28.destroy();
+                }
+
+
                 slide.setTexture(target.slides[contSlide]);
             }
 
@@ -143,6 +159,7 @@ export class Game extends Phaser.Scene {
 
     deletePopUp(){
         if (slide){slide.destroy()}
+        if (video_28){video_28.destroy();}
         if (popButtons){ popButtons.forEach(btn => { btn.destroy() })}
     }
 
@@ -150,8 +167,8 @@ export class Game extends Phaser.Scene {
         /* ANIMACIONES */
         this.anims.create({
             key: 'iddle',
-            frames: this.anims.generateFrameNumbers('indicador', { start: 0, end: 7 }),
-            frameRate: 5,
+            frames: this.anims.generateFrameNumbers('indicador', { start: 0, end: 32 }),
+            frameRate: 15,
             repeat: -1
         });
 
@@ -214,13 +231,13 @@ export class Game extends Phaser.Scene {
         indicador = this.add.sprite(826, 111, 'indicador'); 
         indicador.anims.play('iddle');
         target = this.add.sprite(816, 221, 'square').setScale(2).setInteractive().setAngle(45);
-        target.slides = [58];
+        target.slides = [20, 21, 22];
         targets.push(target);
 
         indicador = this.add.sprite(953, 228, 'indicador'); 
         indicador.anims.play('iddle');
         target = this.add.sprite(943, 338, 'square').setScale(2).setInteractive().setAngle(45);
-        target.slides = [58];
+        target.slides = [20, 21, 22];
         targets.push(target);
 
         indicador = this.add.sprite(565, 72, 'indicador'); 
@@ -238,7 +255,19 @@ export class Game extends Phaser.Scene {
         indicador = this.add.sprite(416, 187, 'indicador'); 
         indicador.anims.play('iddle');
         target = this.add.sprite(406, 197, 'square').setScale(2, 4).setInteractive().setAngle(45);
-        target.slides = [15, 16, 17, 18];
+        target.slides = [14, 15, 17, 18];
+        targets.push(target);
+
+        indicador = this.add.sprite(1505, 56, 'indicador'); 
+        indicador.anims.play('iddle');
+        target = this.add.sprite(1495, 96, 'square').setScale(2, 4).setInteractive().setAngle(45);
+        target.slides = [59, 60, 61, 62, 63, 64, 65];
+        targets.push(target);
+
+        indicador = this.add.sprite(1577, 133, 'indicador'); 
+        indicador.anims.play('iddle');
+        target = this.add.sprite(1567, 233, 'square').setScale(2, 4).setInteractive().setAngle(45);
+        target.slides = [23, 24, 26, 27, 28];
         targets.push(target);
     }
 } 
