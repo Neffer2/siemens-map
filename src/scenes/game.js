@@ -21,7 +21,7 @@ export class Game extends Phaser.Scene {
         this.load.image('home', 'home.png');
         this.load.image('fullScreen-on', 'fullscreen-on.png');
         this.load.image('fullScreen-off', 'fullscreen-off.png');
-        this.load.spritesheet('indicador', 'indicador.png', { frameWidth: 100, frameHeight: 120 });
+        this.load.spritesheet('indicador', 'indicador.png', { frameWidth: 80, frameHeight: 96 });
 
         slides.forEach(cont => {
             this.load.image(cont, `slides/${cont}.png`);
@@ -256,6 +256,12 @@ export class Game extends Phaser.Scene {
         indicador.anims.play('iddle');
         target = this.add.sprite(406, 197, 'square').setScale(2, 4).setInteractive().setAngle(45);
         target.slides = [14, 15, 17, 18];
+        targets.push(target);
+
+        indicador = this.add.sprite(416, 300, 'indicador'); 
+        indicador.anims.play('iddle');
+        target = this.add.sprite(406, 307, 'square').setScale(2, 4).setInteractive().setAngle(45);
+        target.slides = [15, 15, 17, 18];
         targets.push(target);
 
         indicador = this.add.sprite(1505, 56, 'indicador'); 
