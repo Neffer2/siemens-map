@@ -237,7 +237,7 @@ export class Game extends Phaser.Scene {
         indicador = this.add.sprite(953, 228, 'indicador'); 
         indicador.anims.play('iddle');
         target = this.add.sprite(943, 338, 'square').setScale(2).setInteractive().setAngle(45);
-        target.slides = [20, 21, 22];
+        target.slides = [58];
         targets.push(target);
 
         indicador = this.add.sprite(565, 72, 'indicador'); 
