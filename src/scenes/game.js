@@ -3,7 +3,9 @@ let slides = [
     '3', '8', '9', '10', '11', '12', '13', '14', '15', '16',
     '17', '18', '20', '21', '22', '23', '24', '26', '27', '36',
     '39', '46', '47', '52', '53', '54', '55', '56', '58', '59',
-    '60', '61', '62', '63', '64', '65'
+    '60', '61', '62', '63', '64', '65',
+    '25', '29', '30', '31', '32', '33', '34', '35', '37', '38',
+    '41', '42', '43', '44', '49', '50'
 ];
 
 export class Game extends Phaser.Scene {
@@ -102,6 +104,10 @@ export class Game extends Phaser.Scene {
                     video_28 = mContext.add.video((cam.width/2), (cam.height/2), target.slides[contSlide]).setScale(1.3).setScrollFactor(0);
                     video_28.play();
                 }else {
+                    if (video_28){
+                        slide.setAlpha(1);
+                        video_28.destroy();
+                    }
                     slide.setTexture(target.slides[contSlide]);
                 }
             }
@@ -127,8 +133,11 @@ export class Game extends Phaser.Scene {
                 if (target.slides[contSlide + 1] === 28){
                     slide.setAlpha(1);
                     video_28.destroy();
+                }else if (target.slides[contSlide] === 28){
+                    slide.setAlpha(.001);
+                    video_28 = mContext.add.video((cam.width/2), (cam.height/2), target.slides[contSlide]).setScale(1.3).setScrollFactor(0);
+                    video_28.play();
                 }
-
 
                 slide.setTexture(target.slides[contSlide]);
             }
@@ -273,7 +282,9 @@ export class Game extends Phaser.Scene {
         indicador = this.add.sprite(1623, 170, 'indicador'); 
         indicador.anims.play('iddle');
         target = this.add.sprite(1623, 240, 'square').setScale(2, 4).setInteractive().setAngle(45);
-        target.slides = [23, 24, 26, 27, 28];
+        target.slides = [3, 23, 24, 26, 27, 28, 41, 29, 31, 32, 33,
+                        42, 53, 37, 43, 44, 25, 34, 30, 46, 47, 49,
+                        50, 38];
         targets.push(target);
     }
 } 
